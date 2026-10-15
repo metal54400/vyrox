@@ -26,6 +26,17 @@ CREATE TABLE IF NOT EXISTS conversations (
   INDEX idx_conv_user (user_id, updated_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Mémoire personnelle de l'IA (faits appris sur l'utilisateur)
+CREATE TABLE IF NOT EXISTS user_memories (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  fact_type  VARCHAR(40) NOT NULL,
+  fact_value VARCHAR(255) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_mem_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS messages (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   conversation_id INT NOT NULL,
