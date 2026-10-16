@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#09090b">
+    <title>Connexion — Vyrox AI</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        vyrox: {
+                            cyan: '#00d4ff',
+                            purple: '#a855f7',
+                            pink: '#ec4899',
+                            dark: '#09090b',
+                            darker: '#050507',
+                            card: '#12121a',
+                            hover: '#1a1a25',
+                            border: '#27272f',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out'
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
+                        slideUp: { from: { opacity: 0, transform: 'translateY(20px)' }, to: { opacity: 1, transform: 'translateY(0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Grille d'arrière-plan subtile */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-vyrox-dark text-gray-100 font-sans antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden selection:bg-vyrox-cyan/30 selection:text-white">
+    
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-vyrox-cyan/10 rounded-full blur-3xl animate-blob"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-vyrox-purple/10 rounded-full blur-3xl animate-blob" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-vyrox-pink/5 rounded-full blur-3xl animate-blob" style="animation-delay: 4s;"></div>
+        <div class="absolute inset-0 bg-grid opacity-40"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="relative z-10 w-full max-w-md animate-fade-in">
+        
+        <!-- Logo & Header -->
+        <div class="text-center mb-8">
+            <a href="/" class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-vyrox-cyan via-vyrox-purple to-vyrox-pink shadow-2xl shadow-vyrox-purple/30 mb-4 hover:scale-110 hover:rotate-3 transition-all duration-300 group">
+                <i class="fa-solid fa-brain text-3xl text-white group-hover:animate-pulse"></i>
+            </a>
+            <h1 class="text-3xl font-bold mb-2">
+                <span class="bg-gradient-to-r from-vyrox-cyan to-vyrox-purple bg-clip-text text-transparent">Bon retour !</span>
+            </h1>
+            <p class="text-gray-400 text-sm">Connecte-toi pour retrouver ton espace de travail</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-vyrox-card/80 backdrop-blur-xl border border-vyrox-border rounded-2xl p-8 shadow-2xl animate-slide-up hover:border-vyrox-cyan/30 transition-colors duration-300">
+            
+            <form id="loginForm" class="space-y-5" novalidate>
+                
+                <!-- Identifier Field -->
+                <div class="space-y-2 group">
+                    <label for="identifier" class="text-sm font-medium text-gray-300 flex items-center gap-2 transition-colors group-focus-within:text-vyrox-cyan">
+                        <i class="fa-solid fa-user text-xs"></i>
+                        Nom d'utilisateur ou email
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="identifier" 
+                            name="identifier"
+                            placeholder="ton_pseudo ou email@exemple.com"
+                            autocomplete="username"
+                            required
+                            aria-describedby="identifierError"
+                            class="w-full bg-vyrox-darker border border-vyrox-border rounded-lg px-4 py-3 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vyrox-cyan focus:ring-2 focus:ring-vyrox-cyan/20 transition-all duration-200"
+                        >
+                        <i class="fa-solid fa-circle-check absolute right-3 top-1/2 -translate-y-1/2 text-green-500 hidden transition-opacity" id="identifierValid"></i>
+                    </div>
+                    <p class="text-xs text-red-400 hidden flex items-center gap-1" id="identifierError" role="alert">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span></span>
+                    </p>
+                </div>
+
+                <!-- Password Field -->
+                <div class="space-y-2 group">
+                    <label for="password" class="text-sm font-medium text-gray-300 flex items-center gap-2 transition-colors group-focus-within:text-vyrox-purple">
+                        <i class="fa-solid fa-lock text-xs"></i>
+                        Mot de passe
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
+                            required
+                            aria-describedby="passwordError"
+                            class="w-full bg-vyrox-darker border border-vyrox-border rounded-lg px-4 py-3 pr-12 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vyrox-purple focus:ring-2 focus:ring-vyrox-purple/20 transition-all duration-200"
+                        >
+                        <button 
+                            type="button" 
+                            id="togglePassword"
+                            aria-label="Afficher le mot de passe"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors p-1"
+                        >
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-red-400 hidden flex items-center gap-1" id="passwordError" role="alert">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span></span>
+                    </p>
+                </div>
+
+                <!-- Remember & Forgot -->
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center gap-2 cursor-pointer group select-none">
+                        <input type="checkbox" id="remember" class="w-4 h-4 rounded border-vyrox-border bg-vyrox-darker text-vyrox-cyan focus:ring-vyrox-cyan/20 focus:ring-2 cursor-pointer transition-all">
+                        <span class="text-gray-400 group-hover:text-gray-300 transition-colors">Se souvenir de moi</span>
+                    </label>
+                    <a href="#" class="text-vyrox-cyan hover:text-vyrox-purple transition-colors font-medium hover:underline decoration-underline-offset-4">
+                        Mot de passe oublié ?
+                    </a>
+                </div>
+
+                <!-- Global Error Message -->
+                <div id="formError" class="hidden bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 flex items-start gap-2" role="alert" aria-live="polite">
+                    <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                    <span></span>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="w-full bg-gradient-to-r from-vyrox-cyan to-vyrox-purple hover:from-vyrox-cyan/90 hover:to-vyrox-purple/90 text-white font-semibold py-3 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-vyrox-purple/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none flex items-center justify-center gap-2 active:scale-[0.98]"
+                >
+                    <span id="btnText">Se connecter</span>
+                    <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1" id="btnIcon"></i>
+                    <div id="btnLoader" class="hidden">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    </div>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-6">
+                <div class="flex-1 h-px bg-gradient-to-r from-transparent via-vyrox-border to-transparent"></div>
+                <span class="text-xs text-gray-500 uppercase tracking-wider">ou continuer avec</span>
+                <div class="flex-1 h-px bg-gradient-to-r from-transparent via-vyrox-border to-transparent"></div>
+            </div>
+
+            <!-- Social Login -->
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" class="flex items-center justify-center gap-2 px-4 py-2.5 bg-vyrox-darker border border-vyrox-border rounded-lg hover:bg-vyrox-hover hover:border-vyrox-border/80 transition-all duration-200 text-sm text-gray-300 group">
+                    <i class="fa-brands fa-google text-red-500 group-hover:scale-110 transition-transform"></i>
+                    Google
+                </button>
+                <button type="button" class="flex items-center justify-center gap-2 px-4 py-2.5 bg-vyrox-darker border border-vyrox-border rounded-lg hover:bg-vyrox-hover hover:border-vyrox-border/80 transition-all duration-200 text-sm text-gray-300 group">
+                    <i class="fa-brands fa-github text-white group-hover:scale-110 transition-transform"></i>
+                    GitHub
+                </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-6 pt-6 border-t border-vyrox-border">
+                <p class="text-sm text-gray-400">
+                    Pas encore de compte ? 
+                    <a href="/auth/register" class="text-vyrox-cyan hover:text-vyrox-purple font-semibold transition-colors hover:underline decoration-underline-offset-4">
+                        Créer un compte
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Back to home -->
+        <div class="text-center mt-6">
+            <a href="/" class="text-sm text-gray-500 hover:text-gray-300 transition-colors inline-flex items-center gap-2 group">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                Retour à l'accueil
+            </a>
+        </div>
+
+        <!-- License -->
+        <div class="text-center mt-4">
+            <p class="text-xs text-gray-600">© 2026-2029 Orinstudio — Tous droits réservés</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Éléments du DOM ---
+        const form = document.getElementById('loginForm');
+        const identifierInput = document.getElementById('identifier');
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnLoader = document.getElementById('btnLoader');
+        const formError = document.getElementById('formError');
+
+        // --- Toggle Password Visibility ---
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            togglePasswordBtn.querySelector('i').className = isPassword ? 'fa-solid fa-eye-slash text-vyrox-cyan' : 'fa-solid fa-eye';
+            togglePasswordBtn.setAttribute('aria-label', isPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+            passwordInput.focus();
+        });
+
+        // --- Validation en temps réel (Optionnel mais bon pour l'UX) ---
+        identifierInput.addEventListener('input', () => {
+            if (identifierInput.value.trim().length > 2) {
+                document.getElementById('identifierValid').classList.remove('hidden');
+                document.getElementById('identifierError').classList.add('hidden');
+            } else {
+                document.getElementById('identifierValid').classList.add('hidden');
+            }
+        });
+
+        // --- Soumission du formulaire ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset des erreurs
+            hideAllErrors();
+            
+            const identifier = identifierInput.value.trim();
+            const password = passwordInput.value;
+            const remember = document.getElementById('remember').checked;
+
+            // Validation côté client
+            let hasError = false;
+            if (!identifier) {
+                showError('identifierError', 'Veuillez entrer votre nom d\'utilisateur ou email.');
+                hasError = true;
+            }
+            if (!password) {
+                showError('passwordError', 'Veuillez entrer votre mot de passe.');
+                hasError = true;
+            }
+
+            if (hasError) {
+                // Animation de secousse en cas d'erreur
+                form.classList.add('animate-shake');
+                setTimeout(() => form.classList.remove('animate-shake'), 500);
+                return;
+            }
+
+            // État de chargement
+            setLoading(true);
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password, remember })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Sauvegarde sécurisée
+                    localStorage.setItem('vyrox_user', JSON.stringify(data.user));
+                    localStorage.setItem('vyrox_token', data.token);
+                    
+                    // Animation de succès
+                    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Connexion réussie !';
+                    submitBtn.classList.remove('from-vyrox-cyan', 'to-vyrox-purple');
+                    submitBtn.classList.add('from-green-500', 'to-emerald-600');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 800);
+                } else {
+                    showGlobalError(data.error || 'Identifiants incorrects.');
+                    form.classList.add('animate-shake');
+                    setTimeout(() => form.classList.remove('animate-shake'), 500);
+                }
+            } catch (err) {
+                console.error('Erreur de connexion:', err);
+                showGlobalError('Impossible de se connecter au serveur. Vérifiez votre connexion.');
+                form.classList.add('animate-shake');
+                setTimeout(() => form.classList.remove('animate-shake'), 500);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // --- Fonctions utilitaires ---
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.querySelector('span').textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+
+        function showGlobalError(message) {
+            formError.querySelector('span').textContent = message;
+            formError.classList.remove('hidden');
+        }
+
+        function hideAllErrors() {
+            formError.classList.add('hidden');
+            document.querySelectorAll('[id$="Error"]').forEach(el => el.classList.add('hidden'));
+        }
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            if (isLoading) {
+                btnText.textContent = 'Connexion en cours...';
+                btnIcon.classList.add('hidden');
+                btnLoader.classList.remove('hidden');
+            } else {
+                btnText.textContent = 'Se connecter';
+                btnIcon.classList.remove('hidden');
+                btnLoader.classList.add('hidden');
+            }
+        }
+
+        // --- Vérification de session existante ---
+        if (localStorage.getItem('vyrox_token')) {
+            fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${localStorage.getItem('vyrox_token')}` } })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) window.location.href = '/';
+                })
+                .catch(() => {
+                    // Token invalide ou expiré, on laisse l'utilisateur se connecter
+                    localStorage.removeItem('vyrox_token');
+                    localStorage.removeItem('vyrox_user');
+                });
+        }
+    </script>
+</body>
+</html>

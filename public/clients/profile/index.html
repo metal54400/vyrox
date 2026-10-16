@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09090b">
+  <title>Mon Profil — Vyrox AI</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  
+  <script>
+    // Anti-flash : thème appliqué immédiatement
+    const t = localStorage.getItem('vyrox_theme') === 'light';
+    document.documentElement.classList.toggle('light', t);
+    document.documentElement.classList.toggle('dark', !t);
+  </script>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { 
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: { 
+            vyrox: { 
+              cyan: '#00d4ff', purple: '#a855f7', pink: '#ec4899',
+              dark: 'var(--bg-primary)', darker: 'var(--bg-secondary)', card: 'var(--bg-card)',
+              hover: 'var(--bg-hover)', border: 'var(--border-color)' 
+            } 
+          },
+          keyframes: {
+            slideIn: { from: { opacity: 0, transform: 'translateY(-10px)' }, to: { opacity: 1, transform: 'translateY(0)' } }
+          },
+          animation: { slideIn: 'slideIn 0.3s ease-out' }
+        } 
+      }
+    }
+  </script>
+  
+  <style>
+    :root { --bg-primary:#09090b; --bg-secondary:#0f0f13; --bg-card:#16161d; --bg-hover:#1f1f28; --border-color:#27272f; --text:#e5e7eb; --muted:#9ca3af }
+    .light { --bg-primary:#ffffff; --bg-secondary:#f4f4f6; --bg-card:#ffffff; --bg-hover:#ececf0; --border-color:#e2e2e8; --text:#18181b; --muted:#6b7280 }
+    body { background: var(--bg-primary); color: var(--text); }
+    .t1 { color: var(--text); } 
+    .t2 { color: var(--muted); }
+    
+    .avatar-container { position: relative; width: 120px; height: 120px; }
+    .avatar-overlay {
+      position: absolute; inset: 0; border-radius: 9999px;
+      background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s; cursor: pointer; color: white;
+      backdrop-filter: blur(2px);
+    }
+    .avatar-container:hover .avatar-overlay { opacity: 1; }
+  </style>
+</head>
+
+<body class="font-sans antialiased min-h-screen flex flex-col transition-colors duration-300">
+
+  <!-- NAVBAR -->
+  <nav class="h-16 border-b border-vyrox-border bg-vyrox-dark/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 sticky top-0 z-40">
+    <div class="flex items-center gap-4">
+      <a href="/" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-vyrox-hover transition-colors t2 hover:t1" title="Retour au chat">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div class="flex items-center gap-2">
+        <img src="/favicon.png" alt="Vyrox" class="w-6 h-6 rounded-md">
+        <span class="font-bold text-lg t1">Paramètres du compte</span>
+      </div>
+    </div>
+    <button id="themeToggle" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-vyrox-hover transition-colors t2 hover:t1">
+      <i class="fa-solid fa-moon dark:block light:hidden"></i>
+      <i class="fa-solid fa-sun hidden light:block text-yellow-500"></i>
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full space-y-6 animate-slideIn">
+    
+    <!-- CARTE PROFIL -->
+    <div class="bg-vyrox-card border border-vyrox-border rounded-2xl p-6 md:p-8 shadow-sm">
+      <h2 class="text-xl font-bold t1 mb-6 flex items-center gap-2">
+        <i class="fa-regular fa-id-card text-vyrox-cyan"></i> Informations générales
+      </h2>
+      
+      <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+        <!-- Avatar Section -->
+        <div class="flex flex-col items-center gap-3">
+          <div class="avatar-container">
+            <img id="profileImage" src="" alt="Avatar" class="w-full h-full rounded-full object-cover border-2 border-vyrox-border bg-vyrox-darker" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div id="profileFallback" class="w-full h-full rounded-full bg-gradient-to-br from-vyrox-cyan to-vyrox-purple flex items-center justify-center text-3xl font-bold text-white hidden">
+              <span id="avatarInitials">U</span>
+            </div>
+            <label for="avatarInput" class="avatar-overlay" title="Changer la photo">
+              <i class="fa-solid fa-camera text-xl"></i>
+            </label>
+          </div>
+          <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/webp" class="hidden">
+          
+          <button id="saveAvatarBtn" class="hidden px-4 py-2 bg-vyrox-cyan text-black font-semibold rounded-lg hover:bg-cyan-400 transition-all text-sm shadow-lg shadow-cyan-500/20">
+            <i class="fa-solid fa-save mr-2"></i>Sauvegarder
+          </button>
+          <p class="text-xs t2 text-center max-w-[200px]">Cliquez sur l'image pour changer votre photo de profil (Max 2MB, PNG/JPG/WebP)</p>
+        </div>
+
+        <!-- Info Section -->
+        <div class="flex-1 w-full space-y-5">
+          <div>
+            <label class="block text-xs font-semibold t2 uppercase tracking-wider mb-1.5">Nom d'utilisateur</label>
+            <div class="flex items-center gap-3 bg-vyrox-darker border border-vyrox-border rounded-xl px-4 py-3">
+              <i class="fa-solid fa-at t2"></i>
+              <span id="displayUsername" class="t1 font-medium">Chargement...</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-semibold t2 uppercase tracking-wider mb-1.5">Adresse e-mail</label>
+            <div class="flex items-center gap-3 bg-vyrox-darker border border-vyrox-border rounded-xl px-4 py-3">
+              <i class="fa-solid fa-envelope t2"></i>
+              <span id="displayEmail" class="t1 font-medium">Chargement...</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold t2 uppercase tracking-wider mb-1.5">Rôle</label>
+            <div class="flex items-center gap-2">
+              <span id="displayRole" class="px-3 py-1.5 rounded-full text-xs font-bold bg-vyrox-darker border border-vyrox-border t1 flex items-center gap-2">
+                Chargement...
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARTE SÉCURITÉ (Mot de passe) -->
+    <div class="bg-vyrox-card border border-vyrox-border rounded-2xl p-6 md:p-8 shadow-sm">
+      <h2 class="text-xl font-bold t1 mb-6 flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved text-vyrox-purple"></i> Sécurité & Mot de passe
+      </h2>
+      
+      <form id="passwordForm" class="space-y-5 max-w-md">
+        <div>
+          <label class="block text-sm font-medium t1 mb-1.5">Mot de passe actuel</label>
+          <input type="password" id="currentPassword" required class="w-full bg-vyrox-darker border border-vyrox-border rounded-xl px-4 py-3 t1 focus:outline-none focus:border-vyrox-cyan focus:ring-1 focus:ring-vyrox-cyan/50 transition-all placeholder-gray-600">
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium t1 mb-1.5">Nouveau mot de passe</label>
+            <input type="password" id="newPassword" required minlength="6" class="w-full bg-vyrox-darker border border-vyrox-border rounded-xl px-4 py-3 t1 focus:outline-none focus:border-vyrox-cyan focus:ring-1 focus:ring-vyrox-cyan/50 transition-all placeholder-gray-600">
+          </div>
+          <div>
+            <label class="block text-sm font-medium t1 mb-1.5">Confirmer le nouveau</label>
+            <input type="password" id="confirmPassword" required minlength="6" class="w-full bg-vyrox-darker border border-vyrox-border rounded-xl px-4 py-3 t1 focus:outline-none focus:border-vyrox-cyan focus:ring-1 focus:ring-vyrox-cyan/50 transition-all placeholder-gray-600">
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="submitPasswordBtn" class="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-vyrox-cyan to-vyrox-purple text-white font-semibold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20">
+            <i class="fa-solid fa-lock"></i> Mettre à jour le mot de passe
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[60] space-y-2 pointer-events-none"></div>
+
+  <script>
+    // --- UTILITAIRES ---
+    const $ = (id) => document.getElementById(id);
+    const token = localStorage.getItem('vyrox_token');
+
+    function showToast(message, type = 'info') {
+      const container = $('toastContainer');
+      const icons = { success: 'fa-check-circle', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+      const colors = { success: 'text-emerald-400', error: 'text-red-400', info: 'text-vyrox-cyan' };
+      const borders = { success: 'border-emerald-500', error: 'border-red-500', info: 'border-vyrox-cyan' };
+
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl bg-vyrox-card border-l-4 ${borders[type]} animate-slideIn`;
+      toast.innerHTML = `<i class="fa-solid ${icons[type]} ${colors[type]} text-lg"></i><span class="text-sm t1 font-medium">${message}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => { 
+        toast.style.opacity = '0'; 
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 300); 
+      }, 4000);
+    }
+
+    function authHeaders() {
+      return { 'Authorization': `Bearer ${token}` };
+    }
+
+    // --- CHARGEMENT DES DONNÉES ---
+    async function loadProfile() {
+      try {
+        const res = await fetch('/api/auth/me', { headers: authHeaders() });
+        if (!res.ok) throw new Error('Non connecté');
+        const data = await res.json();
+        const user = data.user;
+
+        $('displayUsername').textContent = user.username;
+        $('displayEmail').textContent = user.email;
+        $('avatarInitials').textContent = user.username.substring(0, 2).toUpperCase();
+        
+        const roleBadge = $('displayRole');
+        const isAdmin = user.role === 'admin';
+        roleBadge.innerHTML = isAdmin ? '<i class="fa-solid fa-crown mr-1"></i> Administrateur' : '<i class="fa-regular fa-user mr-1"></i> Utilisateur';
+        roleBadge.className = `px-3 py-1.5 rounded-full text-xs font-bold border flex items-center ${isAdmin ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-vyrox-darker t1 border-vyrox-border'}`;
+
+        if (user.avatar) {
+          $('profileImage').src = user.avatar.startsWith('http') ? user.avatar : `/uploads/avatars/${user.avatar}`;
+        }
+      } catch (err) {
+        showToast('Session expirée. Redirection...', 'error');
+        setTimeout(() => window.location.href = '/auth/login', 1500);
+      }
+    }
+
+    // --- GESTION DE L'AVATAR ---
+    let selectedFile = null;
+
+    $('avatarInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('L\'image ne doit pas dépasser 2 Mo', 'error');
+        e.target.value = ''; // Reset input
+        return;
+      }
+
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        $('profileImage').src = e.target.result;
+        $('profileImage').style.display = 'block';
+        $('profileFallback').style.display = 'none';
+        $('saveAvatarBtn').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    $('saveAvatarBtn').addEventListener('click', async () => {
+      if (!selectedFile) return;
+      $('saveAvatarBtn').disabled = true;
+      $('saveAvatarBtn').innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sauvegarde...';
+
+      const formData = new FormData();
+      formData.append('avatar', selectedFile);
+
+      try {
+        const res = await fetch('/api/profile/avatar', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }, // Pas de Content-Type, FormData le gère automatiquement
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Photo de profil mise à jour avec succès !', 'success');
+          $('saveAvatarBtn').classList.add('hidden');
+          selectedFile = null;
+          $('avatarInput').value = ''; // Reset pour permettre de réuploader le même fichier si besoin
+        } else {
+          showToast(data.error || 'Erreur lors de la sauvegarde', 'error');
+        }
+      } catch (err) {
+        showToast('Erreur réseau lors de l\'upload', 'error');
+      } finally {
+        $('saveAvatarBtn').disabled = false;
+        $('saveAvatarBtn').innerHTML = '<i class="fa-solid fa-save mr-2"></i>Sauvegarder';
+      }
+    });
+
+    // --- GESTION DU MOT DE PASSE ---
+    $('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const current = $('currentPassword').value;
+      const newPass = $('newPassword').value;
+      const confirm = $('confirmPassword').value;
+      const btn = $('submitPasswordBtn');
+
+      if (newPass !== confirm) {
+        showToast('Les nouveaux mots de passe ne correspondent pas', 'error');
+        return;
+      }
+      if (newPass.length < 6) {
+        showToast('Le mot de passe doit contenir au moins 6 caractères', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mise à jour...';
+
+      try {
+        const res = await fetch('/api/profile/password', {
+          method: 'POST',
+          headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast('Mot de passe modifié avec succès !', 'success');
+          $('passwordForm').reset();
+        } else {
+          showToast(data.error || 'Erreur lors de la modification', 'error');
+        }
+      } catch (err) {
+        showToast('Erreur réseau', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Mettre à jour le mot de passe';
+      }
+    });
+
+    // --- THÈME ---
+    $('themeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      if (isDark) {
+        html.classList.replace('dark', 'light');
+        localStorage.setItem('vyrox_theme', 'light');
+      } else {
+        html.classList.replace('light', 'dark');
+        localStorage.setItem('vyrox_theme', 'dark');
+      }
+    });
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>
