@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VYROX ADMIN | Panneau de Contrôle</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vyrox: {
+                            cyan: '#00d4ff',
+                            purple: '#a855f7',
+                            pink: '#ec4899',
+                            dark: '#09090b',
+                            card: '#16161d',
+                            border: '#27272f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #09090b; color: #e2e8f0; }
+        
+        /* Glassmorphism Avancé */
+        .glass-panel {
+            background: rgba(22, 22, 29, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Scrollbar Custom */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f13; }
+        ::-webkit-scrollbar-thumb { background: #27272f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%; width: 24px; height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-vyrox-cyan selection:text-black">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-40 w-full border-b border-vyrox-border bg-[#09090b]/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-vyrox-cyan to-vyrox-purple flex items-center justify-center shadow-lg shadow-vyrox-cyan/20">
+                        <i class="fa-solid fa-shield-halved text-white text-sm"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-white">VYROX <span class="text-vyrox-cyan">ADMIN</span></span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="admin-info" class="text-sm text-gray-400 hidden sm:flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        Chargement...
+                    </div>
+                    <button onclick="logout()" class="group flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                        <i class="fa-solid fa-power-off group-hover:rotate-90 transition-transform"></i> 
+                        <span class="hidden sm:inline">Déconnexion</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 md:p-8">
+        <div class="max-w-7xl mx-auto space-y-8">
+            
+            <!-- Stats Header -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Stat 1 -->
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fa-solid fa-users text-6xl text-blue-500"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Utilisateurs Totaux</p>
+                    <h2 class="text-4xl font-bold text-white mt-2" id="stat-total">-</h2>
+                    <div class="mt-4 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-3/4"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 2 -->
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fa-solid fa-user-shield text-6xl text-emerald-500"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Administrateurs</p>
+                    <h2 class="text-4xl font-bold text-emerald-400 mt-2" id="stat-admins">-</h2>
+                    <div class="mt-4 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-emerald-500 w-1/4"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 3 -->
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fa-solid fa-signal text-6xl text-vyrox-purple"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Sessions Actives</p>
+                    <h2 class="text-4xl font-bold text-vyrox-purple mt-2" id="stat-active">-</h2>
+                    <div class="mt-4 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-vyrox-purple w-1/2 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table Section -->
+            <div class="glass-panel rounded-2xl overflow-hidden border border-vyrox-border">
+                <div class="p-6 border-b border-vyrox-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#0f0f13]/50">
+                    <div>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-ul text-vyrox-cyan"></i> Gestion des Utilisateurs
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-1">Gérez les accès, rôles et suppressions.</p>
+                    </div>
+                    
+                    <div class="relative w-full sm:w-auto">
+                        <input type="text" id="search-input" placeholder="Rechercher (Nom, Email)..." 
+                            class="w-full sm:w-64 bg-[#09090b] border border-vyrox-border text-white text-sm rounded-xl focus:ring-2 focus:ring-vyrox-cyan/50 focus:border-vyrox-cyan block pl-10 pr-4 py-2.5 transition-all outline-none">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fa-solid fa-search text-gray-500"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-400 uppercase bg-[#0f0f13] border-b border-vyrox-border">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold">Utilisateur</th>
+                                <th scope="col" class="px-6 py-4 font-semibold">Email</th>
+                                <th scope="col" class="px-6 py-4 font-semibold text-center">Rôle</th>
+                                <th scope="col" class="px-6 py-4 font-semibold text-center">Statut</th>
+                                <th scope="col" class="px-6 py-4 font-semibold">Inscrit le</th>
+                                <th scope="col" class="px-6 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-vyrox-border">
+                            <!-- Loader Initial -->
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center gap-3 text-gray-500">
+                                        <div class="loader"></div>
+                                        <span class="text-sm">Chargement des données sécurisées...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-vyrox-border bg-[#0f0f13]/30 flex justify-between items-center text-xs text-gray-500">
+                    <span id="table-footer-info">En attente de données...</span>
+                    <button onclick="loadUsers()" class="flex items-center gap-2 text-vyrox-cyan hover:text-white transition-colors">
+                        <i class="fa-solid fa-rotate"></i> Actualiser
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Confirmation Suppression -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-[#16161d] border border-red-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl transform scale-100 transition-transform">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">Suppression définitive</h3>
+                    <p class="text-sm text-gray-400">Cette action ne peut pas être annulée.</p>
+                </div>
+            </div>
+            <p class="text-gray-300 mb-6 bg-black/20 p-3 rounded-lg border border-white/5">
+                Êtes-vous sûr de vouloir supprimer l'utilisateur <span id="delete-username" class="font-bold text-white"></span> ? 
+                Toutes ses conversations et données seront perdues.
+            </p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('delete-modal')" class="px-4 py-2 bg-transparent border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors">Annuler</button>
+                <button id="confirm-delete-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg shadow-red-900/20 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-trash"></i> Confirmer la suppression
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-2"></div>
+
+    <script>
+        // État global
+        let currentUser = null;
+        let allUsers = [];
+        let userToDeleteId = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadStats();
+            loadUsers();
+            
+            // Search Listener avec debounce léger
+            let timeout = null;
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    const term = e.target.value.toLowerCase();
+                    const filtered = allUsers.filter(u => 
+                        u.username.toLowerCase().includes(term) || 
+                        u.email.toLowerCase().includes(term)
+                    );
+                    renderTable(filtered);
+                }, 300);
+            });
+        });
+
+        // Vérification Auth (Admin Only)
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) throw new Error('Non connecté');
+                const data = await res.json();
+                
+                if (data.user.role !== 'admin') {
+                    showToast("Accès refusé : Réservé aux administrateurs.", 'error');
+                    setTimeout(() => window.location.href = '/', 2000);
+                    return;
+                }
+                
+                currentUser = data.user;
+                document.getElementById('admin-info').innerHTML = `
+                    <img src="${data.user.avatar ? '/uploads/avatars/'+data.user.avatar : ''}" 
+                         onerror="this.style.display='none'" 
+                         class="w-6 h-6 rounded-full border border-gray-600 mr-2">
+                    <span class="text-gray-300">Admin:</span> 
+                    <span class="text-vyrox-cyan font-bold">${currentUser.username}</span>`;
+            } catch (err) {
+                window.location.href = '/auth/login';
+            }
+        }
+
+        // Chargement Stats
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                
+                // Animation des nombres
+                animateValue("stat-total", 0, data.database.users, 1000);
+                animateValue("stat-admins", 0, data.database.admins || 0, 1000);
+                animateValue("stat-active", 0, data.database.activeSessions, 1000);
+            } catch (err) {
+                console.error("Erreur stats", err);
+            }
+        }
+
+        // Fonction d'animation des nombres
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Chargement Utilisateurs (API Réelle)
+        async function loadUsers() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center"><div class="flex flex-col items-center gap-3 text-gray-500"><div class="loader"></div><span>Chargement...</span></div></td></tr>`;
+            
+            try {
+                const res = await fetch('/api/users');
+                if (!res.ok) throw new Error('Accès refusé');
+                
+                allUsers = await res.json();
+                document.getElementById('table-footer-info').innerText = `${allUsers.length} utilisateurs trouvés`;
+                renderTable(allUsers);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-red-400"><i class="fa-solid fa-circle-exclamation mr-2"></i>Erreur de chargement. Vérifiez vos droits admin.</td></tr>`;
+            }
+        }
+
+        // Rendu du Tableau
+        function renderTable(users) {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">Aucun utilisateur ne correspond à votre recherche.</td></tr>`;
+                return;
+            }
+
+            users.forEach(user => {
+                const isAdmin = user.role === 'admin';
+                const isActive = user.is_active === 1;
+                const date = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
+                
+                // Avatar logic
+                let avatarHtml;
+                if (user.avatar) {
+                    avatarHtml = `<img src="/uploads/avatars/${user.avatar}" class="w-10 h-10 rounded-full object-cover border border-vyrox-border" alt="${user.username}">`;
+                } else {
+                    const initials = user.username.substring(0,2).toUpperCase();
+                    avatarHtml = `<div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center text-xs font-bold text-white border border-gray-500">${initials}</div>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "bg-transparent hover:bg-white/[0.02] transition-colors group animate-fade-in";
+                
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            ${avatarHtml}
+                            <div>
+                                <div class="font-medium text-white">${user.username}</div>
+                                <div class="text-xs text-gray-500 font-mono">ID: #${user.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-400">${user.email}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${isAdmin ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-gray-800 text-gray-400 border-gray-700'}">
+                            ${isAdmin ? '<i class="fa-solid fa-crown mr-1.5"></i>' : ''} ${user.role.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}">
+                            <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-400' : 'bg-red-400'}"></span>
+                            ${isActive ? 'Actif' : 'Inactif'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-500 text-sm whitespace-nowrap">${date}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                            ${!isAdmin ? `
+                            <button onclick="promoteUser(${user.id}, '${user.username}')" class="w-8 h-8 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Promouvoir Admin">
+                                <i class="fa-solid fa-crown"></i>
+                            </button>` : ''}
+                            
+                            <button onclick="resetPassword(${user.id}, '${user.username}')" class="w-8 h-8 rounded-lg flex items-center justify-center text-blue-400 hover:bg-blue-500/20 transition-colors" title="Réinitialiser MDP">
+                                <i class="fa-solid fa-key"></i>
+                            </button>
+                            
+                            <button onclick="confirmDelete(${user.id}, '${user.username}')" class="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-colors" title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Actions API ---
+
+        async function promoteUser(id, username) {
+            if(!confirm(`Passer ${username} en Administrateur ?`)) return;
+            try {
+                const res = await fetch('/api/admin/promote', { 
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ targetUserId: id, role: 'admin' }) 
+                });
+                const data = await res.json();
+                if(data.success) {
+                    showToast(`${username} est maintenant Administrateur !`, 'success');
+                    loadUsers(); loadStats();
+                } else showToast(data.error, 'error');
+            } catch (err) { showToast('Erreur réseau', 'error'); }
+        }
+
+        async function resetPassword(id, username) {
+            const newPass = prompt(`Nouveau mot de passe pour ${username} :`, 'Vyrox2026!');
+            if (!newPass || newPass.length < 6) return showToast('Le mot de passe doit faire au moins 6 caractères.', 'error');
+
+            try {
+                const res = await fetch('/api/admin/reset-password', { 
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ targetUserId: id, newPassword: newPass }) 
+                });
+                const data = await res.json();
+                if(data.success) showToast(`Mot de passe de ${username} mis à jour.`, 'success');
+                else showToast(data.error, 'error');
+            } catch (err) { showToast('Erreur réseau', 'error'); }
+        }
+
+        function confirmDelete(id, username) {
+            userToDeleteId = id;
+            document.getElementById('delete-username').innerText = username;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!userToDeleteId) return;
+            const btn = document.getElementById('confirm-delete-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Suppression...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/users/${userToDeleteId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.success) {
+                    closeModal('delete-modal');
+                    showToast('Utilisateur supprimé avec succès.', 'success');
+                    loadUsers(); loadStats();
+                } else {
+                    showToast(data.error || 'Erreur lors de la suppression', 'error');
+                }
+            } catch (err) {
+                showToast('Erreur réseau', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+            userToDeleteId = null;
+        }
+
+        function logout() {
+            fetch('/api/auth/logout', { method: 'POST' }).then(() => window.location.href = '/auth/login');
+        }
+
+        // UI Utils: Toast System
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'border-emerald-500 text-emerald-400',
+                error: 'border-red-500 text-red-400',
+                info: 'border-vyrox-cyan text-vyrox-cyan'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-circle-xmark',
+                info: 'fa-circle-info'
+            };
+
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg bg-[#16161d] border-l-4 ${colors[type]} min-w-[300px] animate-fade-in transform transition-all duration-300 translate-y-10 opacity-0`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type]} text-lg"></i>
+                <span class="text-sm text-gray-200 font-medium">${msg}</span>
+            `;
+
+            container.appendChild(toast);
+            
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

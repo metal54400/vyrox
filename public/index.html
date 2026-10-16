@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#09090b">
+  <meta name="description" content="Vyrox AI - Intelligence Artificielle 100% faite maison par Orinstudio">
+  <title>Vyrox AI — Orinstudio © 2026-2029</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  
+  <script>
+    // Anti-flash : thème appliqué immédiatement
+    const t = localStorage.getItem('vyrox_theme') === 'light';
+    document.documentElement.classList.toggle('light', t);
+    document.documentElement.classList.toggle('dark', !t);
+  </script>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      plugins: [({ addVariant }) => addVariant('light', '.light &')],
+      theme: { 
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+          colors: { 
+            vyrox: { 
+              cyan: '#00d4ff', purple: '#a855f7', pink: '#ec4899',
+              dark: 'var(--bg-primary)', darker: 'var(--bg-secondary)', card: 'var(--bg-card)',
+              hover: 'var(--bg-hover)', border: 'var(--border-color)' 
+            } 
+          },
+          keyframes: {
+            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
+            slideIn: { from: { opacity: 0, transform: 'translateY(8px)' }, to: { opacity: 1, transform: 'none' } },
+            fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } }
+          },
+          animation: { float: 'float 3s ease-in-out infinite', 'slide-in': 'slideIn .3s ease-out', 'fade-in': 'fadeIn .3s ease-out' }
+        } 
+      }
+    }
+  </script>
+  
+  <style>
+    :root { --bg-primary:#09090b; --bg-secondary:#0f0f13; --bg-card:#16161d; --bg-hover:#1f1f28; --border-color:#27272f; --text:#e5e7eb; --muted:#9ca3af }
+    .light { --bg-primary:#fff; --bg-secondary:#f4f4f6; --bg-card:#fff; --bg-hover:#ececf0; --border-color:#e2e2e8; --text:#18181b; --muted:#6b7280 }
+    body { background: var(--bg-primary); color: var(--text); }
+    .t1 { color: var(--text); } 
+    .t2 { color: var(--muted); }
+    .nav-btn { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .6rem .75rem; border-radius: .5rem; color: var(--muted); font-size: .875rem; transition: .2s; text-align: left; }
+    .nav-btn:hover { background: var(--bg-hover); color: var(--text); }
+    .icon-btn { width: 2.25rem; height: 2.25rem; display: flex; align-items: center; justify-content: center; border-radius: .5rem; color: var(--muted); transition: .2s; }
+    .icon-btn:hover { background: var(--bg-hover); color: var(--text); }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 9999px; }
+    .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: #00d4ff; animation: dot 1s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: .15s; }
+    .typing-dot:nth-child(3) { animation-delay: .3s; }
+    @keyframes dot { 0%,80%,100% { transform: translateY(0); opacity: .4; } 40% { transform: translateY(-6px); opacity: 1; } }
+    .toggle-switch { appearance: none; width: 40px; height: 22px; border-radius: 9999px; background: var(--border-color); position: relative; cursor: pointer; transition: .2s; flex-shrink: 0; }
+    .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: .2s; }
+    .toggle-switch:checked { background: linear-gradient(135deg, #00d4ff, #a855f7); }
+    .toggle-switch:checked::after { transform: translateX(18px); }
+    #app { height: 100vh; height: 100dvh; }
+    @media(max-width: 767px) { #sidebar { position: fixed; inset: 0 auto 0 0; z-index: 40; transform: translateX(-100%); } #sidebar.open { transform: none; } }
+    @media(min-width: 768px) { #sidebar.collapsed { margin-left: -18rem; } }
+  </style>
+</head>
+
+<body class="font-sans antialiased overflow-hidden transition-colors duration-300">
+  <div id="app" class="flex w-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-vyrox-darker border-r border-vyrox-border flex flex-col transition-all duration-300 flex-shrink-0">
+      <div class="p-3 space-y-1">
+        <button id="newChatBtn" class="nav-btn !bg-vyrox-card border border-vyrox-border t1 font-medium" title="Ctrl+Shift+O">
+          <i class="fa-regular fa-pen-to-square"></i><span>Nouvelle conversation</span>
+        </button>
+        <button id="searchToggle" class="nav-btn" title="Ctrl+K">
+          <i class="fa-solid fa-magnifying-glass"></i><span>Rechercher</span>
+        </button>
+      </div>
+      
+      <div id="searchBar" class="hidden px-3 pb-2">
+        <input id="searchInput" type="text" placeholder="Rechercher..." class="w-full bg-vyrox-card border border-vyrox-border rounded-lg px-3 py-2 text-sm t1 focus:outline-none focus:border-vyrox-cyan">
+      </div>
+      
+      <nav class="flex-1 overflow-y-auto px-2 py-1 space-y-1 custom-scrollbar">
+        <button class="nav-btn nav-item"><i class="fa-solid fa-wand-magic-sparkles text-vyrox-purple"></i><span>Ma création</span></button>
+        <button id="navCoder" class="nav-btn"><i class="fa-solid fa-code"></i><span>Coder</span></button>
+        <button class="nav-btn nav-item"><i class="fa-solid fa-users"></i><span>Communauté</span></button>
+        <div class="border-t border-vyrox-border my-2"></div>
+        <div class="flex items-center justify-between px-3 py-1">
+          <span class="text-xs font-semibold t2 uppercase tracking-wider">Discussions</span>
+          <button id="refreshHistory" class="icon-btn !w-7 !h-7" title="Rafraîchir"><i class="fa-solid fa-rotate text-xs"></i></button>
+        </div>
+        <div id="conversationsList" class="space-y-1"></div>
+      </nav>
+
+      <!-- MENU UTILISATEUR & ADMIN -->
+      <div class="p-3 border-t border-vyrox-border relative group">
+        <button id="userMenuBtn" class="nav-btn w-full">
+          <span class="w-8 h-8 rounded-full bg-gradient-to-br from-vyrox-cyan to-vyrox-purple flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/20">
+            <i class="fa-solid fa-user text-xs text-white"></i>
+          </span>
+          <span class="flex-1 min-w-0 text-left ml-2">
+            <span id="userName" class="block text-sm font-medium t1 truncate">Chargement...</span>
+            <span id="userRoleBadge" class="block text-[10px] uppercase font-bold tracking-wider text-emerald-400 opacity-0 transition-opacity">Administrateur</span>
+          </span>
+          <i class="fa-solid fa-chevron-up text-xs t2"></i>
+        </button>
+
+        <!-- Menu Déroulant (Caché par défaut) -->
+        <div id="userDropdown" class="hidden absolute bottom-full left-3 right-3 mb-2 bg-vyrox-card border border-vyrox-border rounded-xl shadow-2xl overflow-hidden z-50 animate-slide-in origin-bottom">
+          
+          <!-- Option Admin (Visible seulement si admin) -->
+          <a href="/auth/admin" id="adminLink" class="hidden flex items-center gap-3 px-4 py-3 hover:bg-vyrox-hover transition-colors border-b border-vyrox-border/50">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="flex-1">
+              <span class="block text-sm font-medium t1">Panneau Admin</span>
+              <span class="text-xs t2">Gérer les utilisateurs</span>
+            </div>
+          </a>
+
+          <!-- Option Profil (Lien corrigé) -->
+          <a href="/clients/profile" class="flex items-center gap-3 px-4 py-3 hover:bg-vyrox-hover transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <span class="text-sm font-medium t1">Mon Profil</span>
+          </a>
+
+          <!-- Option Déconnexion -->
+          <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 transition-colors text-left group/logout">
+            <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center group-hover/logout:bg-red-500 group-hover/logout:text-white transition-colors">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <span class="text-sm font-medium text-red-400 group-hover/logout:text-red-500">Se déconnecter</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 flex flex-col min-w-0 bg-vyrox-dark relative">
+      <header class="h-14 border-b border-vyrox-border flex items-center justify-between px-3 bg-vyrox-dark z-10">
+        <div class="flex items-center gap-2">
+          <button id="toggleSidebar" class="icon-btn" title="Menu"><i class="fa-solid fa-bars"></i></button>
+          <img src="/favicon.png" alt="" class="w-6 h-6 rounded-md">
+          <span class="text-sm font-semibold t1">Vyrox AI</span>
+          <span class="px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-vyrox-cyan to-vyrox-purple text-white rounded">v5.0</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button id="shareBtn" class="icon-btn" title="Partager la conversation"><i class="fa-solid fa-share-nodes"></i></button>
+          <button id="themeToggle" class="icon-btn" title="Thème">
+            <i class="fa-solid fa-moon dark:block light:hidden"></i><i class="fa-solid fa-sun hidden light:block text-yellow-500"></i>
+          </button>
+          <button id="settingsBtn" class="icon-btn" title="Paramètres"><i class="fa-solid fa-gear"></i></button>
+        </div>
+      </header>
+
+      <div id="chatScroll" class="flex-1 overflow-y-auto custom-scrollbar">
+        <div id="welcomeScreen" class="min-h-full flex items-center justify-center p-6">
+          <div class="max-w-3xl w-full text-center">
+            <img src="/favicon.png" alt="Vyrox AI" class="w-20 h-20 rounded-2xl mx-auto mb-4 shadow-2xl shadow-purple-500/30 animate-float">
+            <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-vyrox-cyan to-vyrox-purple bg-clip-text text-transparent mb-2">Comment puis-je vous aider ?</h1>
+            <p class="t2 text-sm mb-8">Vyrox AI — Intelligence artificielle 100% faite maison par Orinstudio</p>
+            <div id="suggestions" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-left"></div>
+          </div>
+        </div>
+        <div id="messagesContainer" class="hidden max-w-3xl mx-auto px-4 py-6"><div id="messages" class="space-y-6"></div></div>
+      </div>
+
+      <button id="scrollBtn" class="hidden absolute bottom-28 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-vyrox-card border border-vyrox-border shadow-lg t2 hover:t1 z-10" title="Aller en bas"><i class="fa-solid fa-arrow-down"></i></button>
+
+      <div class="p-3 md:p-4 border-t border-vyrox-border bg-vyrox-dark">
+        <div class="max-w-3xl mx-auto">
+          <div class="relative bg-vyrox-card border border-vyrox-border rounded-2xl focus-within:border-vyrox-cyan/50 focus-within:ring-2 focus-within:ring-cyan-400/20 transition-all">
+            <textarea id="messageInput" rows="1" maxlength="4000" placeholder="Message Vyrox..." class="w-full bg-transparent t1 placeholder-gray-500 px-4 py-4 pr-24 resize-none focus:outline-none text-sm max-h-48 custom-scrollbar"></textarea>
+            <div class="absolute right-2 bottom-2 flex items-center gap-1">
+              <button id="voiceBtn" class="icon-btn !w-8 !h-8" title="Dictée vocale"><i class="fa-solid fa-microphone text-sm"></i></button>
+              <button id="sendBtn" disabled class="w-8 h-8 rounded-lg bg-gradient-to-r from-vyrox-cyan to-vyrox-purple text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"><i class="fa-solid fa-arrow-up text-sm"></i></button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-2 px-1 text-xs t2">
+            <span><i class="fa-solid fa-circle-info mr-1"></i>Vyrox peut faire des erreurs. <span id="charCount" class="ml-2 opacity-70">0/4000</span></span>
+            <span class="flex items-center gap-1.5"><span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span><span id="statusText">En ligne</span></span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- PARAMÈTRES -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div class="bg-vyrox-card border border-vyrox-border rounded-2xl w-full max-w-md shadow-2xl animate-slide-in">
+      <div class="flex items-center justify-between p-4 border-b border-vyrox-border">
+        <h2 class="text-lg font-semibold flex items-center gap-2 t1"><i class="fa-solid fa-gear text-vyrox-cyan"></i>Paramètres</h2>
+        <button id="closeSettings" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-4 space-y-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <label class="flex items-center justify-between p-3 bg-vyrox-darker rounded-lg cursor-pointer">
+          <span><span class="block text-sm font-medium t1">Thème sombre</span><span class="text-xs t2">Bascule clair / sombre</span></span>
+          <input id="setDark" type="checkbox" class="toggle-switch">
+        </label>
+        <label class="flex items-center justify-between p-3 bg-vyrox-darker rounded-lg cursor-pointer">
+          <span><span class="block text-sm font-medium t1">Entrée pour envoyer</span><span class="text-xs t2">Désactivé : Ctrl+Entrée envoie</span></span>
+          <input id="setEnter" type="checkbox" class="toggle-switch">
+        </label>
+        <label class="flex items-center justify-between p-3 bg-vyrox-darker rounded-lg cursor-pointer">
+          <span><span class="block text-sm font-medium t1">Son de réponse</span><span class="text-xs t2">Bip à la fin d'une réponse</span></span>
+          <input id="setSound" type="checkbox" class="toggle-switch">
+        </label>
+        <div class="flex items-center justify-between p-3 bg-vyrox-darker rounded-lg">
+          <span class="text-sm font-medium t1">Taille du texte</span>
+          <select id="setFont" class="bg-vyrox-card border border-vyrox-border rounded-lg px-2 py-1 text-sm t1">
+            <option value="14">Petite</option>
+            <option value="16" selected>Normale</option>
+            <option value="18">Grande</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button id="exportChat" class="nav-btn !bg-vyrox-darker justify-center"><i class="fa-solid fa-file-arrow-down"></i>Exporter (.md)</button>
+          <button id="clearAll" class="nav-btn !bg-vyrox-darker justify-center !text-red-500"><i class="fa-solid fa-trash"></i>Tout supprimer</button>
+        </div>
+        <p class="text-center text-xs t2 pt-3">Raccourcis : Ctrl+K recherche · Ctrl+Shift+O nouveau · Échap fermer<br>Vyrox AI v5.0 · © 2026-2029 Orinstudio</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed top-4 right-4 z-[60] space-y-2 pointer-events-none"></div>
+  
+  <!-- Scripts de l'application -->
+  <script src="/app.js"></script>
+  <script src="/features.js"></script>
+
+  <!-- SCRIPT DE GESTION DU MENU UTILISATEUR & ADMIN -->
+  <script>
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminLink = document.getElementById('adminLink');
+    const userRoleBadge = document.getElementById('userRoleBadge');
+    const userNameDisplay = document.getElementById('userName');
+
+    // Toggle du menu au clic
+    if (userMenuBtn) {
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('hidden');
+      });
+    }
+
+    // Fermer le menu si on clique ailleurs sur la page
+    document.addEventListener('click', (e) => {
+      if (userDropdown && !userDropdown.contains(e.target) && e.target !== userMenuBtn) {
+        userDropdown.classList.add('hidden');
+      }
+    });
+
+    // Vérification du statut Admin au chargement de la page
+    async function checkUserStatus() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (!res.ok) throw new Error('Non connecté');
+        const data = await res.json();
+        
+        if (data.success && data.user) {
+          userNameDisplay.innerText = data.user.username;
+          
+          // Si Admin : afficher le badge et le lien vers le panneau d'administration
+          if (data.user.role === 'admin') {
+            adminLink.classList.remove('hidden');
+            adminLink.classList.add('flex');
+            userRoleBadge.style.opacity = '1';
+          } else {
+            adminLink.classList.add('hidden');
+            adminLink.classList.remove('flex');
+            userRoleBadge.style.opacity = '0';
+          }
+        }
+      } catch (err) {
+        // Utilisateur non connecté ou erreur
+        userNameDisplay.innerText = "Invité";
+        userRoleBadge.style.opacity = '0';
+      }
+    }
+
+    // Fonction de Déconnexion
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+          try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/auth/login';
+          } catch (e) {
+            console.error('Erreur lors de la déconnexion:', e);
+            window.location.href = '/auth/login'; 
+          }
+        }
+      });
+    }
+
+    // Lancer la vérification au chargement du DOM
+    document.addEventListener('DOMContentLoaded', checkUserStatus);
+  </script>
+</body>
+</html>
